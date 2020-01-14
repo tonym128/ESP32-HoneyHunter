@@ -60,7 +60,6 @@ struct GameBuff
 	int maxGameMode = 8;
 
 	bool enter = false;
-	bool fireRunning = true;
 	bool firstRun = true;
 };
 
@@ -88,6 +87,7 @@ static bool maskCollisionCheck(Dimensions rect1, Dimensions rect2, const bool *o
 static bool maskCollisionCheck(Dimensions rect1, Dimensions rect2, const uint8_t *object1, const uint8_t *object2);
 static void displayClear(GameBuff *gameBuff, uint8_t colour);
 static void drawObject(GameBuff *gameBuff, Dimensions dim, const uint8_t *objectArray, int alpha);
+static void drawObject(GameBuff *gameBuff, int x, int y, int width, int height, int tile, int linelength, const uint8_t *objectArray, int alpha);
 bool displayImage(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
 bool displayImageInfinite(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap);
 static void drawScreenDouble(GameBuff *gameBuff);
@@ -262,6 +262,24 @@ static void drawObject(GameBuff *gameBuff, Dimensions dim, const uint8_t *object
 				}
 			}
 			counter++;
+		}
+	}
+}
+
+static void drawObject(GameBuff *gameBuff, int x, int y, int width, int height, int tile, int linelength, const uint8_t *objectArray, int alpha)
+{
+	int counter = 0;
+	int bitmapPixel = 0;
+
+	for (int j = 0; j < height; j++) {
+		int dimXmod = x <= 0 ? 1 : x;
+		for (int i = 0; i < width; i++) {
+			int pixel = x + i + (gameBuff->WIDTH * (y + j));
+			if (pixel >= 0 && pixel < gameBuff->MAXPIXEL && y + j == pixel / gameBuff->WIDTH) {
+				bitmapPixel = tile * 32 + i + j * linelength;
+				if (objectArray[bitmapPixel] != alpha)
+					gameBuff->consoleBuffer[pixel] = objectArray[bitmapPixel];
+			}
 		}
 	}
 }

@@ -136,11 +136,10 @@ void gameSetup()
 {
   if (gameBuff == nullptr)
     gameBuff = new GameBuff();
-	  gameBuff->gameMode = 0;
+	  gameBuff->gameMode = 1;
 	  gameBuff->maxGameMode = 8;
 
-	  gameBuff->enter = false;
-  	gameBuff->fireRunning = true;
+	  gameBuff->enter = true;
   	gameBuff->firstRun = true;
 
   if (gameBuff->badgeState == nullptr || gameBuff->badgeState == NULL)
