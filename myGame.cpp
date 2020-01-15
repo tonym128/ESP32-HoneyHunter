@@ -96,6 +96,8 @@ void inputBee(GameBuff *gameBuff) {
 		beeGame.x += frameTimeInMillis * 4000;
 	}
 
+	if (beeGame.x > INT_TO_FIXP(gameBuff->WIDTH-32)) beeGame.x = INT_TO_FIXP(gameBuff->WIDTH-32);
+	if (beeGame.x < INT_TO_FIXP(0)) beeGame.x = INT_TO_FIXP(0);
 	lastTimeInMillis = currentTimeInMillis;
 }
 
@@ -122,10 +124,10 @@ void updateBeeGame(GameBuff *gameBuff) {
 	}
 
 	if (beeGame.onFlower) {
-		beeGame.power += frameTimeInMillis * 2000;
+		beeGame.power += frameTimeInMillis * 1000;
 	}
 
-	beeGame.power -= frameTimeInMillis * 100;
+	beeGame.power -= frameTimeInMillis * 50;
 
 	if (beeGame.power > beeGame.maxpower) beeGame.power = beeGame.maxpower;
 	if (beeGame.power < INT_TO_FIXP(0)) beeGame.power = INT_TO_FIXP(0);
@@ -217,8 +219,7 @@ void drawBeeStatus(GameBuff *gameBuff) {
 	dimImage.y = 0;
 	dimImage.height = 32;
 	dimImage.width = 32;
-
-	drawObjectScrollLoop(gameBuff,dimScreen,dimImage,bee_comb_image,-1);
+	drawObjectScrollLoop(gameBuff,dimScreen,dimImage,bee_comb_image,0x00);
 }
 
 bool firstRun = true;

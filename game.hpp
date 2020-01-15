@@ -236,7 +236,7 @@ static void drawObjectScrollLoop(GameBuff *gameBuff, Dimensions dim, Dimensions 
 		{
 			int pixelImage = (y + image.y) * image.width + ((x + image.x) % image.width);
 			int pixelScreen = (y + dim.y) * gameBuff->WIDTH + (x + dim.x);
-			if (pixelScreen < gameBuff->MAXPIXEL)
+			if (pixelScreen < gameBuff->MAXPIXEL && (objectArray[pixelImage] != alpha))
 				gameBuff->consoleBuffer[pixelScreen] = objectArray[pixelImage];
 		}
 	}
