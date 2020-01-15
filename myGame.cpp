@@ -15,8 +15,9 @@ struct Flower {
 
 static const int FLOWER_COUNT = 10;
 struct BeeGame {
-	FIXPOINT x;
+	FIXPOINT x, y, power, maxpower;
 	Flower flowers[FLOWER_COUNT];
+	bool onFlower = false;
 } beeGame;
 
 bool displayMenu(GameBuff *gameBuff)
@@ -98,14 +99,47 @@ void inputBee(GameBuff *gameBuff) {
 	lastTimeInMillis = currentTimeInMillis;
 }
 
+void updateBeeGame(GameBuff *gameBuff) {
+	Dimensions dimBee;
+	dimBee.height = 32;
+	dimBee.width = 32;
+	dimBee.x = FIXP_TO_INT(beeGame.x);
+	dimBee.y = FIXP_TO_INT(beeGame.y);
+
+	Dimensions dimFlower;
+	dimFlower.width = 32;
+	dimFlower.height = 32;
+
+	beeGame.onFlower = false;
+	for (int i = 0; i < FLOWER_COUNT; i++ ) {
+		if (beeGame.flowers[i].visible) {
+			dimFlower.x = FIXP_TO_INT(beeGame.flowers[i].x);
+			dimFlower.y = FIXP_TO_INT(beeGame.flowers[i].y);
+			if (rectCollisionCheck(dimBee,dimFlower)) {
+				beeGame.onFlower = true;
+			}
+		}
+	}
+
+	if (beeGame.onFlower) {
+		beeGame.power += frameTimeInMillis * 2000;
+	}
+
+	beeGame.power -= frameTimeInMillis * 100;
+
+	if (beeGame.power > beeGame.maxpower) beeGame.power = beeGame.maxpower;
+	if (beeGame.power < INT_TO_FIXP(0)) beeGame.power = INT_TO_FIXP(0);
+}
+
 void animateBee(GameBuff *gameBuff) {
 	int startX = (gameBuff->timeInMillis / 100 % 8) * 32;
 	int screenXOffset = FIXP_TO_INT(beeGame.x);
-	int screenYOffset = (gameBuff->HEIGHT - 50) * gameBuff->WIDTH;
+	int screenYOffset = FIXP_TO_INT(beeGame.y) * gameBuff->WIDTH;
 
 	int y = 0;
 	int x = 0;
 	int pixel = 0;
+
 	while (y < 32) {
 		pixel = startX + x + y * 256;
 		while (x < 32) {
@@ -118,12 +152,6 @@ void animateBee(GameBuff *gameBuff) {
 		x = 0;
 		y++;
 	}
-}
-
-// Original implementation was too slow (5fps), changed to bitmap
-void scrollBackgroundJpeg(GameBuff *gameBuff) {
-	TJpgDec.drawJpg(0, gameBuff->timeInMillis / 50 % 320, bg_river_jpg, sizeof(bg_river_jpg));
-	TJpgDec.drawJpg(0, gameBuff->timeInMillis / 50 % 320 - 320, bg_river_jpg, sizeof(bg_river_jpg));
 }
 
 // Draw directly from uncompressed 332 image bitmap, with some minor optimisations
@@ -157,6 +185,10 @@ void scrollBackground(GameBuff *gameBuff) {
 
 void initBeeGame(GameBuff *gameBuff) {
 	beeGame.x = INT_TO_FIXP(gameBuff->WIDTH/3);
+	beeGame.y = INT_TO_FIXP(gameBuff->HEIGHT - 50);
+	beeGame.power = 0;
+	beeGame.maxpower = INT_TO_FIXP(gameBuff->WIDTH);
+	beeGame.onFlower = false;
 
 	for (int i = 0; i < FLOWER_COUNT; i++)
 	{
@@ -174,6 +206,19 @@ void drawFlowers(GameBuff *gameBuff) {
 			beeGame.flowers[i].y += INT_TO_FIXP(frameTimeInMillis / 30);
 		}
 	}
+}
+void drawBeeStatus(GameBuff *gameBuff) {
+	Dimensions dimScreen, dimImage;
+	dimScreen.x = 0;
+	dimScreen.y = 0;
+	dimScreen.width = FIXP_TO_INT(beeGame.power);
+	dimScreen.height = 32;
+	dimImage.x = 0;
+	dimImage.y = 0;
+	dimImage.height = 32;
+	dimImage.width = 32;
+
+	drawObjectScrollLoop(gameBuff,dimScreen,dimImage,bee_comb_image,-1);
 }
 
 bool firstRun = true;
@@ -198,9 +243,11 @@ bool myGameLoop(GameBuff *gameBuff)
 			}
 
 			inputBee(gameBuff);
+			updateBeeGame(gameBuff);
 			scrollBackground(gameBuff);
 			drawFlowers(gameBuff);
 			animateBee(gameBuff);
+			drawBeeStatus(gameBuff);
 			break;
 		}
 		return false;

@@ -45,10 +45,13 @@ struct BadgeState
 };
 
 // Game Buffer
+#define SCREEN_WIDTH 135;
+#define SCREEN_HEIGHT 240;
+
 struct GameBuff
 {
-	static const int WIDTH = 135;
-	static const int HEIGHT = 240;
+	static const int WIDTH = SCREEN_WIDTH;
+	static const int HEIGHT = SCREEN_HEIGHT;
 	static const int MAXPIXEL = WIDTH * HEIGHT;
 	uint8_t *consoleBuffer = nullptr;
 	PlayerKeys playerKeys;
