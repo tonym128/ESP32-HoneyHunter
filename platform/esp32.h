@@ -221,20 +221,20 @@ void gameInit()
   tft.setSwapBytes(true); // Swap the byte order for pushImage() - corrects endianness
   tft.fillScreen(TFT_BLACK);
 
-  Serial.println("Input Init");
-  TOUCH_SENSE = getRawInput();
-  for (int i = 0; i < 8; i++)
-  {
-    TOUCH_SENSE[i] /= 2;
-    if (TOUCH_SENSE[i] > TOUCH_SENSE_MAX)
-      TOUCH_SENSE[i] = TOUCH_SENSE_MAX;
-    if (TOUCH_SENSE[i] < TOUCH_SENSE_MIN)
-      TOUCH_SENSE[i] = TOUCH_SENSE_MIN;
-    Serial.print("Touch Sense : ");
-    Serial.print(i);
-    Serial.print(" - ");
-    Serial.println(TOUCH_SENSE[i]);
-  }
+  // Serial.println("Input Init");
+  // TOUCH_SENSE = getRawInput();
+  // for (int i = 0; i < 8; i++)
+  // {
+  //   TOUCH_SENSE[i] /= 2;
+  //   if (TOUCH_SENSE[i] > TOUCH_SENSE_MAX)
+  //     TOUCH_SENSE[i] = TOUCH_SENSE_MAX;
+  //   if (TOUCH_SENSE[i] < TOUCH_SENSE_MIN)
+  //     TOUCH_SENSE[i] = TOUCH_SENSE_MIN;
+  //   Serial.print("Touch Sense : ");
+  //   Serial.print(i);
+  //   Serial.print(" - ");
+  //   Serial.println(TOUCH_SENSE[i]);
+  // }
 
   Serial.println("SPIFFS Init");
   if (!SPIFFS.begin(true))

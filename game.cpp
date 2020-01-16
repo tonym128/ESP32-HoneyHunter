@@ -12,6 +12,8 @@ static std::array<int, 8> buttonRaw;
 #include "platform/esp32.h"
 #endif
 
+static unsigned long batteryWarningEnd = 0;
+
 bool displayImageInfinite(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap)
 {
   int screenpixel;
@@ -241,6 +243,22 @@ void gameLoop()
   }
 
 	voltageF = getVoltage();
+  if (voltageF > 3.0 && voltageF < 4.0) {
+        if (batteryWarningEnd == 0) batteryWarningEnd = 5000 + getTimeInMillis();
+        else if (batteryWarningEnd < getTimeInMillis()) {
+						#ifdef ESP32
+						esp_deep_sleep_start();
+						#else
+            drawString(gameBuff,(char*)"DEEPSLEEP!",0,gameBuff->HEIGHT-16,0xE0,0);
+ 						#endif
+
+        }
+        
+        drawString(gameBuff,(char*)"LOW BATTERY!",0,0,0xE0,0);
+        drawString(gameBuff,(char*)"PLEASE CHARGE!",0,0,0xE0,0);
+
+  }
+
   calcFPS();
   if (gameBuff->consoleBuffer != nullptr)
   {
