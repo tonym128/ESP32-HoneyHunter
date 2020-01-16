@@ -41,6 +41,7 @@ typedef uint8_t byte;     // BYTE = unsigned 8 bit value
 unsigned long getTimeInMillis();
 void gameSleep(int);
 float getVoltage();
+void heavySleep();
 
 struct PlayerKeys {
   bool up = false;

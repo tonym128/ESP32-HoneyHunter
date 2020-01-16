@@ -109,6 +109,10 @@ void sendToScreen()
 	SDL_RenderPresent(renderer);
 }
 
+void heavySleep() {
+
+}
+
 void gameInit()
 {
 	SDL_Init(SDL_INIT_VIDEO);

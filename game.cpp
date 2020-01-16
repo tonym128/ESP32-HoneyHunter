@@ -1,5 +1,4 @@
 #define SERIAL_HACK 1
-
 #include "game.hpp"
 
 static GameBuff *gameBuff = nullptr;
@@ -243,15 +242,11 @@ void gameLoop()
   }
 
 	voltageF = getVoltage();
-  if (voltageF > 3.0 && voltageF < 4.0) {
+  if (voltageF > 3.0 && voltageF < 3.8) {
         if (batteryWarningEnd == 0) batteryWarningEnd = 5000 + getTimeInMillis();
         else if (batteryWarningEnd < getTimeInMillis()) {
-						#ifdef ESP32
-						esp_deep_sleep_start();
-						#else
-            drawString(gameBuff,(char*)"DEEPSLEEP!",0,gameBuff->HEIGHT-16,0xE0,0);
- 						#endif
-
+          heavySleep();
+          drawString(gameBuff,(char*)"DEEPSLEEP!",0,gameBuff->HEIGHT-16,0xE0,0);
         }
         
         drawString(gameBuff,(char*)"LOW BATTERY!",0,0,0xE0,0);

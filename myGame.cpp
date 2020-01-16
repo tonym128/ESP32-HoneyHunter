@@ -4,6 +4,7 @@
 #include "files/bg_river_image.h"
 #include "files/flowers_image.h"
 #include "files/winner.jpg.h"
+
 struct Flower {
 	bool visible;
 	FIXPOINT x;
@@ -301,12 +302,9 @@ bool myGameLoop(GameBuff *gameBuff)
 					drawString2x(gameBuff,"  play",0, 16 * 8,colour,0x00);
 					drawString2x(gameBuff,"  again",0,16 * 10,colour,0x00);
 					
-					if (boredCounter > 5) {
-						#ifdef ESP32
-						esp_deep_sleep_start();
-						#else
-						drawString(gameBuff,"DeepSleep",0,0,colour,0x00);	
-  						#endif
+					if (boredCounter > 2) {
+						heavySleep();
+						drawString(gameBuff,(char*)"DEEPSLEEP!",0,gameBuff->HEIGHT-16,0xE0,0);
 					} else {
 						boredCounter++;
 					}

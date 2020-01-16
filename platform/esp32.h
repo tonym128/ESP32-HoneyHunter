@@ -2,6 +2,10 @@
 #include "Button2.h"
 #include "esp_adc_cal.h"
 
+#define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  86400        //Time ESP32 will go to sleep (in seconds)
+
+
 #define BUTTON_1        0
 #define BUTTON_2        35
 #define ADC_PIN         34
@@ -180,8 +184,38 @@ void format()
   SPIFFS.format();
 }
 
+int print_wakeup_reason(){
+	esp_sleep_wakeup_cause_t wakeup_reason;
+	wakeup_reason = esp_sleep_get_wakeup_cause();
+	switch(wakeup_reason)
+	{
+		case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+		case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+		case 3  : Serial.println("Wakeup caused by timer"); break;
+		case 4  : Serial.println("Wakeup caused by touchpad"); break;
+		case 5  : Serial.println("Wakeup caused by ULP program"); break;
+		default : Serial.println("Wakeup was not caused by deep sleep"); break;
+	}
+
+  return wakeup_reason;
+}
+
+void heavySleep() {
+	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_deep_sleep_start();						
+}
+
 void gameInit()
 {
+  // Go back to sleep, if we woke up without reason.
+  int wakeup_reason = print_wakeup_reason();
+  if (wakeup_reason > 0 && wakeup_reason < 5) {
+    heavySleep();
+  }
+
   Serial.println("gameInit");
   // setupBLE();
   Serial.println("Screen Init");
@@ -209,7 +243,7 @@ void gameInit()
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize((adc_unit_t)ADC_UNIT_1, (adc_atten_t)ADC1_CHANNEL_6, (adc_bits_width_t)ADC_WIDTH_BIT_12, 1100, &adc_chars);
     //Check type of calibration value used to characterize ADC
     if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
-        Serial.printf("eFuse Vref:%u mV", adc_chars.vref);
+        Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
         vref = adc_chars.vref;
     } else if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP) {
         Serial.printf("Two Point --> coeff_a:%umV coeff_b:%umV\n", adc_chars.coeff_a, adc_chars.coeff_b);
