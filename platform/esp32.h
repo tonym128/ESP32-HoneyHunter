@@ -38,7 +38,7 @@ static float battery_voltage = 0.0f;
 static uint64_t timeStamp = 0;
 
 float getVoltage() {
-    if (millis() - timeStamp > 10000) {
+    if (millis() - timeStamp > 2000) {
         float v = ((float)analogRead(ADC_PIN) / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
         if (v > 0) {
           battery_voltage = v;

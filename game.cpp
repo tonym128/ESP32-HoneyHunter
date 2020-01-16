@@ -255,8 +255,8 @@ void gameLoop()
         }
         
         drawString(gameBuff,(char*)"LOW BATTERY!",0,0,0xE0,0);
-        drawString(gameBuff,(char*)"PLEASE CHARGE!",0,0,0xE0,0);
-
+        drawString(gameBuff,(char*)"PLEASE CHARGE!",0,16,0xE0,0);
+        return;
   }
 
   calcFPS();
