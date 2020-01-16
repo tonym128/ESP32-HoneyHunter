@@ -182,12 +182,6 @@ void processInput(byte buttonVals)
 
   gameBuff->playerKeys.up = processKey(buttonVals, P1_Top);
   gameBuff->playerKeys.down = processKey(buttonVals, P1_Bottom);
-  gameBuff->playerKeys.left = processKey(buttonVals, P1_Left);
-  gameBuff->playerKeys.right = processKey(buttonVals, P1_Right);
-  gameBuff->playerKeys.a = processKey(buttonVals, P2_Right);
-  gameBuff->playerKeys.b = processKey(buttonVals, P2_Left);
-  gameBuff->playerKeys.start = processKey(buttonVals, P2_Bottom);
-  gameBuff->playerKeys.select = processKey(buttonVals, P2_Top);
 
   if (gameBuff->playerKeys.debouncedInput && buttonVals > 0) {
     gameBuff->playerKeys.debouncedInput = false;
@@ -246,6 +240,7 @@ void gameLoop()
     gameSetup();
   }
 
+	voltageF = getVoltage();
   calcFPS();
   if (gameBuff->consoleBuffer != nullptr)
   {
@@ -266,6 +261,7 @@ void gameLoop()
 #endif
 
       drawFPS(gameBuff);
+      drawVoltage(gameBuff);
     }
 
 #ifdef ESP32

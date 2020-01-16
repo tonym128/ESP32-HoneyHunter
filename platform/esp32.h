@@ -5,6 +5,7 @@
 #define BUTTON_1        0
 #define BUTTON_2        35
 #define ADC_PIN         34
+#define ADC_EN          14
 
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
@@ -33,14 +34,16 @@ int readAnalogSensorRaw(int pin)
 }
 
 static int vref = 1100;
-static float battery_voltage;
+static float battery_voltage = 0.0f;
 static uint64_t timeStamp = 0;
 
 float getVoltage() {
-    if (millis() - timeStamp > 1000) {
+    if (millis() - timeStamp > 10000) {
+        float v = ((float)analogRead(ADC_PIN) / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
+        if (v > 0) {
+          battery_voltage = v;
+        }
         timeStamp = millis();
-        uint16_t v = analogRead(ADC_PIN);
-        battery_voltage = ((float)v / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
     }
 
     return battery_voltage;
@@ -49,15 +52,8 @@ float getVoltage() {
 byte getReadShiftAnalog()
 {
   byte buttonVals = 0;
-  buttonVals = buttonVals | (readAnalogSensor(32, TOUCH_SENSE[0]) << P1_Left);
-  buttonVals = buttonVals | ((readAnalogSensor(14, TOUCH_SENSE[1]) || btn1Press) << P1_Top);
-  buttonVals = buttonVals | (readAnalogSensor(27, TOUCH_SENSE[2]) << P1_Right);
-  buttonVals = buttonVals | ((readAnalogSensor(33, TOUCH_SENSE[3]) || btn2Press) << P1_Bottom);
-
-  buttonVals = buttonVals | (readAnalogSensor(15, TOUCH_SENSE[4]) << P2_Right);
-  buttonVals = buttonVals | (readAnalogSensor(13, TOUCH_SENSE[5]) << P2_Bottom);
-  buttonVals = buttonVals | (readAnalogSensor(2, TOUCH_SENSE[6]) << P2_Left);
-  buttonVals = buttonVals | (readAnalogSensor(12, TOUCH_SENSE[7]) << P2_Top);
+  buttonVals = buttonVals | (btn1Press << P1_Top);
+  buttonVals = buttonVals | (btn2Press << P1_Bottom);
 
   return buttonVals;
 }
@@ -71,14 +67,14 @@ std::array<int, 8> getRawInput()
   }
 
   int i = 0;
-  rawValues[i++] = readAnalogSensorRaw(32); // Left
-  rawValues[i++] = readAnalogSensorRaw(14) || btn2Press; // Up
-  rawValues[i++] = readAnalogSensorRaw(27); // Right
-  rawValues[i++] = readAnalogSensorRaw(33) || btn1Press; // Down
-  rawValues[i++] = readAnalogSensorRaw(15); // A
-  rawValues[i++] = readAnalogSensorRaw(13); // Start
-  rawValues[i++] = readAnalogSensorRaw(2);  // B
-  rawValues[i++] = readAnalogSensorRaw(12); // Select
+  // rawValues[i++] = readAnalogSensorRaw(32); // Left
+  // rawValues[i++] = readAnalogSensorRaw(14) || btn2Press; // Up
+  // rawValues[i++] = readAnalogSensorRaw(27); // Right
+  // rawValues[i++] = readAnalogSensorRaw(33) || btn1Press; // Down
+  // rawValues[i++] = readAnalogSensorRaw(15); // A
+  // rawValues[i++] = readAnalogSensorRaw(13); // Start
+  // rawValues[i++] = readAnalogSensorRaw(2);  // B
+  // rawValues[i++] = readAnalogSensorRaw(12); // Select
 
   return rawValues;
 }
@@ -208,6 +204,7 @@ void gameInit()
   });
 
   // VRef Setup for Voltage
+   pinMode(ADC_PIN, INPUT);
     esp_adc_cal_characteristics_t adc_chars;
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize((adc_unit_t)ADC_UNIT_1, (adc_atten_t)ADC1_CHANNEL_6, (adc_bits_width_t)ADC_WIDTH_BIT_12, 1100, &adc_chars);
     //Check type of calibration value used to characterize ADC

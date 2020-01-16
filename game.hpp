@@ -32,6 +32,8 @@ static bool esp32gameon_debug_fps_serial = false;
 static bool esp32gameon_debug_output = false;
 static unsigned long esp32gameon_debounce = 0;
 
+static float voltageF = 0.0;
+
 
 // First Time Boot missing badge.json (assign a UID, BT_ADDR)
 struct BadgeState
@@ -884,9 +886,9 @@ static void calcFPS()
 	}
 }
 
+static char fpsString[50];
 static void drawFPS(GameBuff *gameBuff)
 {
-	char fpsString[50];
 #ifdef ESP32
 	sprintf(fpsString, "%3.2f fps %d - %s", currentFPS(), ESP.getFreeHeap(), getDevicePlatform());
 #elif _WIN32
@@ -894,7 +896,19 @@ static void drawFPS(GameBuff *gameBuff)
 #else
 	sprintf(fpsString, "%3.2f fps - %s", currentFPS(), getDevicePlatform());
 #endif
-	drawString(gameBuff, fpsString, 0, gameBuff->HEIGHT - 8, 0xFF, -1);
+	drawString(gameBuff, fpsString, 0, gameBuff->HEIGHT-8, 0xFF, 0);
+}
+
+static void drawVoltage(GameBuff *gameBuff)
+{
+#ifdef ESP32
+	sprintf(fpsString,"Voltage : %3.2fV",voltageF);
+#elif _WIN32
+	sprintf_s(fpsString,"Voltage : %3.2fV",voltageF);
+#else
+	sprintf(fpsString,"Voltage : %3.2fV",voltageF);
+#endif
+	drawString(gameBuff, fpsString, 0, gameBuff->HEIGHT-16, 0xFF, 0);
 }
 
 static void setCurrentTime()

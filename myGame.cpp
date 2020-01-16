@@ -4,8 +4,6 @@
 #include "files/bg_river_image.h"
 #include "files/flowers_image.h"
 #include "files/winner.jpg.h"
-
-float voltageF = 0.0;
 struct Flower {
 	bool visible;
 	FIXPOINT x;
@@ -20,7 +18,7 @@ struct BeeGame {
 	Flower flowers[FLOWER_COUNT];
 	unsigned long flowerSpawnTimer, nextFlowerSpawn;
 	bool onFlower = false;
-	bool bitmask[135*10];
+	bool bitmask[135];
 	bool win = false;
 } beeGame;
 
@@ -43,17 +41,6 @@ bool displayMenu(GameBuff *gameBuff)
 	drawString(gameBuff, (char *)"3) Demo ", x, i += 16, gameBuff->gameMode == gameBuff->maxGameMode++ ? 0x1C : 0xFF, 0);
 
 	gameBuff->maxGameMode--;
-
-	char voltage[30]; 
-
-#ifdef ESP32
-	sprintf(voltage,"Voltage : %3.2fV",voltageF);
-#elif _WIN32
-	sprintf_s(voltage,"Voltage : %3.2fV",voltageF);
-#else
-	sprintf(voltage,"Voltage : %3.2fV",voltageF);
-#endif
-	drawString(gameBuff, voltage, 0, gameBuff->HEIGHT-16, gameBuff->gameMode == gameBuff->maxGameMode++ ? 0x1C : 0xFF, 0);
 	return true;
 }
 
@@ -150,8 +137,8 @@ void updateBeeGame(GameBuff *gameBuff) {
 	if (beeGame.nextFlowerSpawn < currentTimeInMillis) {
 		for (int i = 0; i < FLOWER_COUNT; i++) {
 			if (!beeGame.flowers[i].visible) {
-				int x = rand() % gameBuff->WIDTH;
-				if (beeGame.bitmask[x]) {
+				int x = rand() % (gameBuff->WIDTH-16);
+				if (beeGame.bitmask[x+16]) {
 					beeGame.flowers[i].type = rand() % 6;
 					beeGame.flowers[i].x = INT_TO_FIXP(x);
 					beeGame.flowers[i].y = INT_TO_FIXP(-32);
@@ -198,12 +185,17 @@ void scrollBackground(GameBuff *gameBuff) {
 	startY1 = (startY1 + frameTimeInMillis / 30) % 320;
 	int startY1Mod = startY1;
 	int imageY = 0;
+	int pixel, imagepixel;
+
 	while (startY1Mod < gameBuff->HEIGHT) {
 		for (int i = 0; i < gameBuff->WIDTH; i++) { 
-			gameBuff->consoleBuffer[startY1Mod * gameBuff->WIDTH + i] = bg_river_image[imageY * gameBuff->WIDTH + i];
-			
-			if ((startY1Mod * gameBuff->WIDTH + i) < 10 * gameBuff->WIDTH) {
-				beeGame.bitmask[startY1Mod * gameBuff->WIDTH + i] = bg_river_mask[imageY * gameBuff->WIDTH + i];
+			pixel = startY1Mod * gameBuff->WIDTH + i;
+			imagepixel = imageY * gameBuff->WIDTH + i;
+
+			gameBuff->consoleBuffer[pixel] = bg_river_image[imagepixel];
+
+			if ((pixel) < gameBuff->WIDTH) {
+				beeGame.bitmask[pixel] = bg_river_mask[imagepixel];
 			}
 		}
 
@@ -217,10 +209,13 @@ void scrollBackground(GameBuff *gameBuff) {
 	while (startY2 < startY1 && startY2 < gameBuff->HEIGHT) { 
 		if (startY2 >= 0)
 			for (int i = 0; i < gameBuff->WIDTH; i++) { 
-				gameBuff->consoleBuffer[startY2 * gameBuff->WIDTH + i] = bg_river_image[imageY * gameBuff->WIDTH + i];
+				pixel = startY2 * gameBuff->WIDTH + i;
+				imagepixel = imageY * gameBuff->WIDTH + i;
 
-				if ((startY1Mod * gameBuff->WIDTH + i) < 10 * gameBuff->WIDTH) {
-					beeGame.bitmask[startY1Mod * gameBuff->WIDTH + i] = bg_river_mask[imageY * gameBuff->WIDTH + i];
+				gameBuff->consoleBuffer[pixel] = bg_river_image[imagepixel];
+
+				if ((pixel) < gameBuff->WIDTH) {
+					beeGame.bitmask[pixel] = bg_river_mask[imagepixel];
 				}
 			}
 
@@ -269,13 +264,10 @@ void drawBeeStatus(GameBuff *gameBuff) {
 	drawObjectScrollLoop(gameBuff,dimScreen,dimImage,bee_comb_image,0x00);
 }
 
+uint8_t boredCounter = 0;
 bool firstRun = true;
 bool myGameLoop(GameBuff *gameBuff)
 {
-	if (gameBuff->playerKeys.up) {
-		voltageF = getVoltage();
-	}
-
 	if (gameBuff->enter)
 	{
 		switch (gameBuff->gameMode)
@@ -308,6 +300,16 @@ bool myGameLoop(GameBuff *gameBuff)
 					drawString2x(gameBuff,"   to",0,   16 * 6,colour,0x00);
 					drawString2x(gameBuff,"  play",0, 16 * 8,colour,0x00);
 					drawString2x(gameBuff,"  again",0,16 * 10,colour,0x00);
+					
+					if (boredCounter > 5) {
+						#ifdef ESP32
+						esp_deep_sleep_start();
+						#else
+						drawString(gameBuff,"DeepSleep",0,0,colour,0x00);	
+  						#endif
+					} else {
+						boredCounter++;
+					}
 				}
 			}
 			break;
