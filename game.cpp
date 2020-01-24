@@ -33,7 +33,9 @@ bool displayImageInfinite(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t
       colour = MakeColor565(r, g, b);
       screenpixel = x + i + (y + j) * gameBuff->WIDTH;
       if (screenpixel >= 0 && screenpixel < gameBuff->MAXPIXEL)
-        { gameBuff->consoleBuffer[screenpixel] = colour; }
+      {
+        gameBuff->consoleBuffer[screenpixel] = colour;
+      }
     }
   }
 
@@ -60,7 +62,9 @@ bool displayImage(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap
       colour = MakeColor565(r, g, b);
       screenpixel = x + i + (y + j) * gameBuff->WIDTH;
       if (screenpixel >= 0 && screenpixel < gameBuff->MAXPIXEL)
-        { gameBuff->consoleBuffer[screenpixel] = colour; }
+      {
+        gameBuff->consoleBuffer[screenpixel] = colour;
+      }
     }
   }
 
@@ -70,7 +74,7 @@ bool displayImage(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap
 BadgeState *loadBadgeSettings()
 {
   JSON_Value *user_data;
-  char *fileData = gameLoadFile((char*)"Badge.json");
+  char *fileData = gameLoadFile((char *)"Badge.json");
   user_data = json_parse_string(fileData);
   free(fileData);
 
@@ -80,18 +84,21 @@ BadgeState *loadBadgeSettings()
   }
 
   BadgeState *state = (BadgeState *)malloc(sizeof(struct BadgeState));
-  state->bt_addr = (char *)json_object_get_string(json_object(user_data), (char*)"bt_addr");
+  state->bt_addr = (char *)json_object_get_string(json_object(user_data), (char *)"bt_addr");
 
-  state->ssid = (char *)json_object_get_string(json_object(user_data), (char*)"ssid");
+  state->ssid = (char *)json_object_get_string(json_object(user_data), (char *)"ssid");
   ssid = state->ssid;
 
-  state->password = (char *)json_object_get_string(json_object(user_data), (char*)"password");
+  state->password = (char *)json_object_get_string(json_object(user_data), (char *)"password");
   password = state->password;
 
-  if (json_object_has_value(json_object(user_data), (char*)"customBoot")) {
-    state->customBoot = (bool)json_object_get_boolean(json_object(user_data), (char*)"customBoot");
-    state->bootMenuItem = (int)json_object_get_number(json_object(user_data), (char*)"bootMenuItem");
-  } else {
+  if (json_object_has_value(json_object(user_data), (char *)"customBoot"))
+  {
+    state->customBoot = (bool)json_object_get_boolean(json_object(user_data), (char *)"customBoot");
+    state->bootMenuItem = (int)json_object_get_number(json_object(user_data), (char *)"bootMenuItem");
+  }
+  else
+  {
     state->customBoot = false;
     state->bootMenuItem = 0;
   }
@@ -99,13 +106,13 @@ BadgeState *loadBadgeSettings()
   free(user_data);
 
   // Try to load Badge Name
-  fileData = gameLoadFile((char*)"Name.json");
+  fileData = gameLoadFile((char *)"Name.json");
   user_data = json_parse_string(fileData);
   free(fileData);
 
   if (user_data != NULL)
   {
-    state->name = (char *)json_object_get_string(json_object(user_data), (char*)"name");
+    state->name = (char *)json_object_get_string(json_object(user_data), (char *)"name");
     free(user_data);
   }
   else
@@ -127,21 +134,20 @@ void saveBadgeSettings(BadgeState *state)
   json_object_set_number(root_object, "bootMenuItem", (double)state->bootMenuItem);
   char *stateString = json_serialize_to_string_pretty(root_value);
 
-  gameSaveFile((char*)"Badge.json", stateString);
+  gameSaveFile((char *)"Badge.json", stateString);
   json_free_serialized_string(stateString);
   json_value_free(root_value);
 }
-
 
 void gameSetup()
 {
   if (gameBuff == nullptr)
     gameBuff = new GameBuff();
-	  gameBuff->gameMode = 1;
-	  gameBuff->maxGameMode = 8;
+  gameBuff->gameMode = 1;
+  gameBuff->maxGameMode = 8;
 
-	  gameBuff->enter = true;
-  	gameBuff->firstRun = true;
+  gameBuff->enter = false;
+  gameBuff->firstRun = true;
 
   if (gameBuff->badgeState == nullptr || gameBuff->badgeState == NULL)
   {
@@ -171,7 +177,8 @@ void gameSetup()
 
   displayClear(gameBuff, 0x00);
 
-  if (gameBuff->badgeState->customBoot) {
+  if (gameBuff->badgeState->customBoot)
+  {
     gameBuff->enter = true;
     gameBuff->gameMode = gameBuff->badgeState->bootMenuItem;
   }
@@ -184,10 +191,13 @@ void processInput(byte buttonVals)
   gameBuff->playerKeys.up = processKey(buttonVals, P1_Top);
   gameBuff->playerKeys.down = processKey(buttonVals, P1_Bottom);
 
-  if (gameBuff->playerKeys.debouncedInput && buttonVals > 0) {
+  if (gameBuff->playerKeys.debouncedInput && buttonVals > 0)
+  {
     gameBuff->playerKeys.debouncedInput = false;
     gameBuff->playerKeys.debounceTimeout = gameBuff->playerKeys.debounceDelay + gameBuff->timeInMillis;
-  } else if (!gameBuff->playerKeys.debouncedInput && gameBuff->playerKeys.debounceTimeout < gameBuff->timeInMillis) {
+  }
+  else if (!gameBuff->playerKeys.debouncedInput && gameBuff->playerKeys.debounceTimeout < gameBuff->timeInMillis)
+  {
     gameBuff->playerKeys.debouncedInput = true;
   }
 
@@ -227,7 +237,8 @@ void processInput(byte buttonVals)
   // }
 }
 
-void serialInput() {
+void serialInput()
+{
 }
 
 void gameLoop()
@@ -241,17 +252,20 @@ void gameLoop()
     gameSetup();
   }
 
-	voltageF = getVoltage();
-  if (voltageF > 3.0 && voltageF < 3.8) {
-        if (batteryWarningEnd == 0) batteryWarningEnd = 5000 + getTimeInMillis();
-        else if (batteryWarningEnd < getTimeInMillis()) {
-          heavySleep();
-          drawString(gameBuff,(char*)"DEEPSLEEP!",0,gameBuff->HEIGHT-16,0xE0,0);
-        }
-        
-        drawString(gameBuff,(char*)"LOW BATTERY!",0,0,0xE0,0);
-        drawString(gameBuff,(char*)"PLEASE CHARGE!",0,16,0xE0,0);
-        return;
+  voltageF = getVoltage();
+  if (voltageF > 3.0 && voltageF < 3.8)
+  {
+    if (batteryWarningEnd == 0)
+      batteryWarningEnd = 5000 + getTimeInMillis();
+    else if (batteryWarningEnd < getTimeInMillis())
+    {
+      heavySleep();
+      drawString(gameBuff, (char *)"DEEPSLEEP!", 0, gameBuff->HEIGHT - 16, 0xE0, 0);
+    }
+
+    drawString(gameBuff, (char *)"LOW BATTERY!", 0, 0, 0xE0, 0);
+    drawString(gameBuff, (char *)"PLEASE CHARGE!", 0, 16, 0xE0, 0);
+    return;
   }
 
   calcFPS();
@@ -269,7 +283,7 @@ void gameLoop()
         dimRed.height = 30;
 
         drawBlock(gameBuff, dimRed, 0xE0);
-        drawString(gameBuff,(char*)"heap!",0,0,0xFF,0);
+        drawString(gameBuff, (char *)"heap!", 0, 0, 0xFF, 0);
       }
 #endif
 
@@ -278,7 +292,8 @@ void gameLoop()
     }
 
 #ifdef ESP32
-    if (esp32gameon_debug_fps_serial) {
+    if (esp32gameon_debug_fps_serial)
+    {
       Serial.println(currentFPS());
     }
 #endif
