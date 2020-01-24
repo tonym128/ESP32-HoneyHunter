@@ -2,7 +2,7 @@
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("setup");
+  Serial.println("Setup");
   
   gameInit();
   gameSetup();

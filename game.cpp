@@ -82,11 +82,11 @@ BadgeState *loadBadgeSettings()
   BadgeState *state = (BadgeState *)malloc(sizeof(struct BadgeState));
   state->bt_addr = (char *)json_object_get_string(json_object(user_data), (char*)"bt_addr");
 
-  state->ssid = (char *)json_object_get_string(json_object(user_data), (char*)"ssid");
-  ssid = state->ssid;
+  // state->ssid = (char *)json_object_get_string(json_object(user_data), (char*)"ssid");
+  // ssid = state->ssid;
 
-  state->password = (char *)json_object_get_string(json_object(user_data), (char*)"password");
-  password = state->password;
+  // state->password = (char *)json_object_get_string(json_object(user_data), (char*)"password");
+  // password = state->password;
 
   if (json_object_has_value(json_object(user_data), (char*)"customBoot")) {
     state->customBoot = (bool)json_object_get_boolean(json_object(user_data), (char*)"customBoot");
@@ -197,6 +197,7 @@ void processInput(byte buttonVals)
     {
       esp32gameon_debug_fps = !esp32gameon_debug_fps;
       esp32gameon_debounce = gameBuff->timeInMillis + 1000;
+      esp32gameon_debug_counter++;
     }
   }
 
@@ -271,8 +272,26 @@ void gameLoop()
         drawBlock(gameBuff, dimRed, 0xE0);
         drawString(gameBuff,(char*)"heap!",0,0,0xFF,0);
       }
-#endif
 
+      switch (esp32gameon_debug_counter) {
+        case 3: 
+          drawString(gameBuff,(char*)"Connecting",0,0,0xFF,0);
+          esp32gameon_debug_counter++;
+          break;
+        case 4: 
+          initOTA();
+          esp32gameon_debug_counter++;
+          break;
+        case 5: 
+          char IP[] = "xxx.xxx.xxx.xxx";          // buffer
+          IPAddress ip = WiFi.localIP();
+          ip.toString().toCharArray(IP, 16);
+          drawString(gameBuff,(char*)IP,0,0,0xFF,0);
+          ArduinoOTA.handle();
+          break;
+      }
+
+#endif
       drawFPS(gameBuff);
       drawVoltage(gameBuff);
     }

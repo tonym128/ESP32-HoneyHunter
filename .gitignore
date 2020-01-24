@@ -1,3 +1,6 @@
+# Don't autosave secrets.h
+secrets.h
+
 # Prerequisites
 *.d
 
@@ -45,11 +48,10 @@ CTestTestfile.cmake
 .vs/
 .vscode/ipch/
 .vscode/
+*.json
 # Ignore the failure of getting git to run via vcpkg and cmake on Windows
 SDL2/
 
 # Don't save EMCC generated files
 index.*
 
-# Don't autosave secrets.h
-/secrets.h
