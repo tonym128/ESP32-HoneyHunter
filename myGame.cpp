@@ -104,9 +104,10 @@ bool myGameLoop(GameBuff *gameBuff)
 		case 0:
 			if (firstRun) {
 				firstRun = false;
-				displayClear(gameBuff,0x00);
-				TJpgDec.drawJpg(0,0,winner_jpg,sizeof(winner_jpg));
 			}
+
+			displayClear(gameBuff,0x00);
+			TJpgDec.drawJpg(0,0,winner_jpg,sizeof(winner_jpg));
 
 			if (gameBuff->playerKeys.down) gameBuff->enter = false;
 			break;
