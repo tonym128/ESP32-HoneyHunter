@@ -5,7 +5,6 @@
 #define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  86400        //Time ESP32 will go to sleep (in seconds)
 
-
 #define BUTTON_1        0
 #define BUTTON_2        35
 #define ADC_PIN         34
@@ -201,6 +200,9 @@ int print_wakeup_reason(){
 }
 
 void heavySleep() {
+  tft.writecommand(TFT_DISPOFF);
+  tft.writecommand(TFT_SLPIN);
+
 	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
 	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
