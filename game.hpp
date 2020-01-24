@@ -27,6 +27,11 @@
 #include <time.h>
 #include "secrets.h"
 
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+
 static bool esp32gameon_debug_fps = false;
 static bool esp32gameon_debug_fps_serial = false;
 static bool esp32gameon_debug_output = false;
