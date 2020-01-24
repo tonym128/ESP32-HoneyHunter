@@ -1,6 +1,3 @@
-# Don't autosave secrets.h
-secrets.h
-
 # Prerequisites
 *.d
 
