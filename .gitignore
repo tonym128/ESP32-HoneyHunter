@@ -50,3 +50,6 @@ SDL2/
 
 # Don't save EMCC generated files
 index.*
+
+# Don't autosave secrets.h
+secrets.h
