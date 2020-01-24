@@ -206,17 +206,17 @@ void heavySleep() {
 	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
 	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_sleep_enable_ext1_wakeup(GPIO_SEL_35, ESP_EXT1_WAKEUP_ALL_LOW);
   esp_deep_sleep_start();						
 }
 
 void gameInit()
 {
   // Go back to sleep, if we woke up without reason.
-  int wakeup_reason = print_wakeup_reason();
-  if (wakeup_reason > 0 && wakeup_reason < 5) {
-    heavySleep();
-  }
+  // int wakeup_reason = print_wakeup_reason();
+  // if (wakeup_reason > 0 && wakeup_reason < 5) {
+  //   heavySleep();
+  // }
 
   Serial.println("gameInit");
   // setupBLE();
