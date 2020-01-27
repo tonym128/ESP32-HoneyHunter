@@ -211,13 +211,7 @@ void heavySleep() {
 }
 
 void gameInit()
-{
-  // Go back to sleep, if we woke up without reason.
-  // int wakeup_reason = print_wakeup_reason();
-  // if (wakeup_reason > 0 && wakeup_reason < 5) {
-  //   heavySleep();
-  // }
-
+{  
   Serial.println("gameInit");
   // setupBLE();
   Serial.println("Screen Init");

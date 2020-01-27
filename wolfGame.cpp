@@ -1,8 +1,13 @@
 #include "wolfGame.hpp"
+WolfGame wolfGame;
 
-unsigned long lastTimeInMillis = 0;
-unsigned long currentTimeInMillis = 0;
-unsigned long frameTimeInMillis = 0;
+bool wolfGameWin() {
+	return wolfGame.win;
+}
+
+bool wolfGameDone() {
+	return currentTimeInMillis + 10000 < getTimeInMillis();
+}
 
 void inputWolf(GameBuff *gameBuff) {
 	if (wolfGame.win) return;

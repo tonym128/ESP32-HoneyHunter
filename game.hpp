@@ -79,6 +79,10 @@ static void initOTA() {
 }
 #endif
 
+static unsigned long lastTimeInMillis = 0;
+static unsigned long currentTimeInMillis = 0;
+static unsigned long frameTimeInMillis = 0;
+
 static bool esp32gameon_debug_fps = false;
 static bool esp32gameon_debug_fps_serial = false;
 static bool esp32gameon_debug_output = false;

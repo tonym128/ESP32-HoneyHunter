@@ -139,7 +139,7 @@ void gameSetup()
     gameBuff = new GameBuff();
 	  // Bee Game - gameBuff->gameMode = 1;
 	  // Wolf Game - gameBuff->gameMode = 2;
-	  gameBuff->gameMode = 1;
+	  gameBuff->gameMode = 2;
 	  gameBuff->maxGameMode = 8;
 
 	  gameBuff->enter = true;

@@ -26,8 +26,6 @@ struct WolfGame {
 	bool win = false;
 };
 
-static WolfGame wolfGame;
-
 void inputWolf(GameBuff *gameBuff);
 void updateWolfGame(GameBuff *gameBuff);
 void animateWolf(GameBuff *gameBuff);
@@ -35,5 +33,7 @@ void wolf_scrollBackground(GameBuff *gameBuff);
 void initWolfGame(GameBuff *gameBuff);
 void drawSnowFlakes(GameBuff *gameBuff);
 void drawWolfStatus(GameBuff *gameBuff);
+bool wolfGameWin();
+bool wolfGameDone();
 
 #endif

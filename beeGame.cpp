@@ -1,4 +1,13 @@
 #include "beeGame.hpp"
+BeeGame beeGame;
+
+bool beeGameWin() {
+	return beeGame.win;
+}
+
+bool beeGameDone() {
+	return currentTimeInMillis + 10000 < getTimeInMillis();
+}
 
 void inputBee(GameBuff *gameBuff) {
 	if (beeGame.win) return;

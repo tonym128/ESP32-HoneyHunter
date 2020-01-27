@@ -72,14 +72,14 @@ bool myGameLoop(GameBuff *gameBuff)
 			inputBee(gameBuff);
 			updateBeeGame(gameBuff);
 
-			if (!beeGame.win) {
+			if (!beeGameWin()) {
 				displayClear(gameBuff,0x00);
 				scrollBackground(gameBuff);
 				drawFlowers(gameBuff);
 				animateBee(gameBuff);
 				drawBeeStatus(gameBuff);
 			} else {
-				if (currentTimeInMillis + 10000 < getTimeInMillis()) {
+				if (beeGameDone()) {
 					heavySleep();
 				}
 			}
@@ -93,14 +93,14 @@ bool myGameLoop(GameBuff *gameBuff)
 			inputWolf(gameBuff);
 			updateWolfGame(gameBuff);
 
-			if (!wolfGame.win) {
+			if (!wolfGameWin()) {
 				displayClear(gameBuff,0x00);
 				wolf_scrollBackground(gameBuff);
 				drawSnowFlakes(gameBuff);
 				animateWolf(gameBuff);
 				drawWolfStatus(gameBuff);
 			} else {
-				if (currentTimeInMillis + 10000 < getTimeInMillis()) {
+				if (wolfGameDone()) {
 					heavySleep();
 				}
 			}

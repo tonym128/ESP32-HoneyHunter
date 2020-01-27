@@ -25,12 +25,6 @@ struct BeeGame {
 	bool win = false;
 };
 
-static BeeGame beeGame;
-
-static unsigned long lastTimeInMillis = 0;
-static unsigned long currentTimeInMillis = 0;
-static unsigned long frameTimeInMillis = 0;
-
 void inputBee(GameBuff *gameBuff);
 void updateBeeGame(GameBuff *gameBuff);
 void animateBee(GameBuff *gameBuff);
@@ -38,5 +32,7 @@ void scrollBackground(GameBuff *gameBuff);
 void initBeeGame(GameBuff *gameBuff);
 void drawFlowers(GameBuff *gameBuff);
 void drawBeeStatus(GameBuff *gameBuff);
+bool beeGameWin();
+bool beeGameDone();
 
 #endif
