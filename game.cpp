@@ -137,6 +137,8 @@ void gameSetup()
 {
   if (gameBuff == nullptr)
     gameBuff = new GameBuff();
+	  // Bee Game - gameBuff->gameMode = 1;
+	  // Wolf Game - gameBuff->gameMode = 2;
 	  gameBuff->gameMode = 1;
 	  gameBuff->maxGameMode = 8;
 

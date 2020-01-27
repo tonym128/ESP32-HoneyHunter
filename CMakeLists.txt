@@ -10,6 +10,8 @@ add_executable(${PROJECT_NAME}
     game.cpp 
     myfont.cpp 
     mypigfont.cpp 
+    beeGame.cpp 
+    wolfGame.cpp 
     myGame.cpp 
     platform_core.cpp
     )
