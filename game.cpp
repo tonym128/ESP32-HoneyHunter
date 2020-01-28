@@ -139,7 +139,7 @@ void gameSetup()
     gameBuff = new GameBuff();
 	  // Bee Game - gameBuff->gameMode = 1;
 	  // Wolf Game - gameBuff->gameMode = 2;
-	  gameBuff->gameMode = 2;
+	  gameBuff->gameMode = 1;
 	  gameBuff->maxGameMode = 8;
 
 	  gameBuff->enter = true;
@@ -157,7 +157,7 @@ void gameSetup()
       gameBuff->badgeState->ssid = ssid;
       gameBuff->badgeState->password = password;
       gameBuff->badgeState->customBoot = false;
-      gameBuff->badgeState->bootMenuItem = 0;
+      gameBuff->badgeState->bootMenuItem = 1; // Default to be game
 
       saveBadgeSettings(gameBuff->badgeState);
       gameBuff->badgeState = loadBadgeSettings();
@@ -173,10 +173,25 @@ void gameSetup()
 
   displayClear(gameBuff, 0x00);
 
-  if (gameBuff->badgeState->customBoot) {
-    gameBuff->enter = true;
-    gameBuff->gameMode = gameBuff->badgeState->bootMenuItem;
+#ifdef ESP32
+  int wakeup = print_wakeup_reason();
+  if (wakeup == ESP_SLEEP_WAKEUP_UNDEFINED)
+  {
+    if (gameBuff->badgeState->bootMenuItem == 2)
+    {
+      gameBuff->badgeState->bootMenuItem = 1;
+    }
+    else
+    {
+      gameBuff->badgeState->bootMenuItem = 2;
+    }
+
+    saveBadgeSettings(gameBuff->badgeState);
   }
+
+  gameBuff->gameMode = gameBuff->badgeState->bootMenuItem; // Boot into boot menu item
+#endif
+
 }
 
 void processInput(byte buttonVals)

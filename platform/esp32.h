@@ -2,13 +2,13 @@
 #include "Button2.h"
 #include "esp_adc_cal.h"
 
-#define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  86400        //Time ESP32 will go to sleep (in seconds)
+#define uS_TO_S_FACTOR 1000000ULL /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP 86400       //Time ESP32 will go to sleep (in seconds)
 
-#define BUTTON_1        0
-#define BUTTON_2        35
-#define ADC_PIN         34
-#define ADC_EN          14
+#define BUTTON_1 0
+#define BUTTON_2 35
+#define ADC_PIN 34
+#define ADC_EN 14
 
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
@@ -22,7 +22,7 @@ int inputVal = 0;
 static std::array<int, 8> TOUCH_SENSE;
 static const char *DEVICE = (char *)"ESP32";
 
-TFT_eSPI tft = TFT_eSPI(135, 240); 
+TFT_eSPI tft = TFT_eSPI(135, 240);
 
 bool readAnalogSensor(int pin, int touch_sense)
 {
@@ -40,16 +40,19 @@ static int vref = 1100;
 static float battery_voltage = 0.0f;
 static uint64_t timeStamp = 0;
 
-float getVoltage() {
-    if (millis() - timeStamp > 2000) {
-        float v = ((float)analogRead(ADC_PIN) / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
-        if (v > 0) {
-          battery_voltage = v;
-        }
-        timeStamp = millis();
+float getVoltage()
+{
+  if (millis() - timeStamp > 2000)
+  {
+    float v = ((float)analogRead(ADC_PIN) / 4095.0) * 2.0 * 3.3 * (vref / 1000.0);
+    if (v > 0)
+    {
+      battery_voltage = v;
     }
+    timeStamp = millis();
+  }
 
-    return battery_voltage;
+  return battery_voltage;
 }
 
 byte getReadShiftAnalog()
@@ -84,8 +87,8 @@ std::array<int, 8> getRawInput()
 
 void button_loop()
 {
-    btn1.loop();
-    btn2.loop();
+  btn1.loop();
+  btn2.loop();
 }
 
 byte getReadShift()
@@ -183,69 +186,88 @@ void format()
   SPIFFS.format();
 }
 
-int print_wakeup_reason(){
-	esp_sleep_wakeup_cause_t wakeup_reason;
-	wakeup_reason = esp_sleep_get_wakeup_cause();
-	switch(wakeup_reason)
-	{
-		case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-		case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-		case 3  : Serial.println("Wakeup caused by timer"); break;
-		case 4  : Serial.println("Wakeup caused by touchpad"); break;
-		case 5  : Serial.println("Wakeup caused by ULP program"); break;
-		default : Serial.println("Wakeup was not caused by deep sleep"); break;
-	}
+int print_wakeup_reason()
+{
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+  switch (wakeup_reason)
+  {
+  case 1:
+    Serial.println("Wakeup caused by external signal using RTC_IO");
+    break;
+  case 2:
+    Serial.println("Wakeup caused by external signal using RTC_CNTL");
+    break;
+  case 3:
+    Serial.println("Wakeup caused by timer");
+    break;
+  case 4:
+    Serial.println("Wakeup caused by touchpad");
+    break;
+  case 5:
+    Serial.println("Wakeup caused by ULP program");
+    break;
+  default:
+    Serial.println("Wakeup was not caused by deep sleep");
+    break;
+  }
 
   return wakeup_reason;
 }
 
-void heavySleep() {
+void heavySleep()
+{
   tft.writecommand(TFT_DISPOFF);
   tft.writecommand(TFT_SLPIN);
 
-	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
-	esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF);
   esp_sleep_enable_ext1_wakeup(GPIO_SEL_35, ESP_EXT1_WAKEUP_ALL_LOW);
-  esp_deep_sleep_start();						
+  esp_deep_sleep_start();
 }
 
 void gameInit()
-{  
+{
   Serial.println("gameInit");
   // setupBLE();
   Serial.println("Screen Init");
 
   // Button Setup for built in buttons
-  btn1.setPressedHandler([](Button2 & b) {
+  btn1.setPressedHandler([](Button2 &b) {
     btn1Press = true;
   });
 
-  btn2.setPressedHandler([](Button2 & b) {
+  btn2.setPressedHandler([](Button2 &b) {
     btn2Press = true;
   });
 
-  btn1.setReleasedHandler([](Button2 & b) {
+  btn1.setReleasedHandler([](Button2 &b) {
     btn1Press = false;
   });
 
-  btn2.setReleasedHandler([](Button2 & b) {
+  btn2.setReleasedHandler([](Button2 &b) {
     btn2Press = false;
   });
 
   // VRef Setup for Voltage
-   pinMode(ADC_PIN, INPUT);
-    esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_value_t val_type = esp_adc_cal_characterize((adc_unit_t)ADC_UNIT_1, (adc_atten_t)ADC1_CHANNEL_6, (adc_bits_width_t)ADC_WIDTH_BIT_12, 1100, &adc_chars);
-    //Check type of calibration value used to characterize ADC
-    if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
-        Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
-        vref = adc_chars.vref;
-    } else if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP) {
-        Serial.printf("Two Point --> coeff_a:%umV coeff_b:%umV\n", adc_chars.coeff_a, adc_chars.coeff_b);
-    } else {
-        Serial.println("Default Vref: 1100mV");
-    }
+  pinMode(ADC_PIN, INPUT);
+  esp_adc_cal_characteristics_t adc_chars;
+  esp_adc_cal_value_t val_type = esp_adc_cal_characterize((adc_unit_t)ADC_UNIT_1, (adc_atten_t)ADC1_CHANNEL_6, (adc_bits_width_t)ADC_WIDTH_BIT_12, 1100, &adc_chars);
+  //Check type of calibration value used to characterize ADC
+  if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF)
+  {
+    Serial.printf("eFuse Vref:%u mV\n", adc_chars.vref);
+    vref = adc_chars.vref;
+  }
+  else if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP)
+  {
+    Serial.printf("Two Point --> coeff_a:%umV coeff_b:%umV\n", adc_chars.coeff_a, adc_chars.coeff_b);
+  }
+  else
+  {
+    Serial.println("Default Vref: 1100mV");
+  }
 
   tft.begin();            // initialize a ST7789 chip
   tft.setSwapBytes(true); // Swap the byte order for pushImage() - corrects endianness
